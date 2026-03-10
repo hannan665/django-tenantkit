@@ -1,0 +1,4 @@
+Django>=4.2,<6.0
+django-tenants>=3.8.0
+djangorestframework>=3.14.0
+PyJWT>=2.0.0

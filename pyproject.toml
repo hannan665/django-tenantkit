@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-tenantkit"
+version = "0.1.0"
+description = "Pluggable multi-tenant toolkit for Django — schema & database backends, JWT auth, tenant-scoped middleware."
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.9"
+authors = [
+    {name = "TenantKit"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Framework :: Django",
+    "Framework :: Django :: 4",
+    "Framework :: Django :: 5",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "Django>=4.2,<6.0",
+    "django-tenants>=3.8.0",
+    "djangorestframework>=3.14.0",
+    "PyJWT>=2.0.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-django>=4.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/hannanhafeez/django-tenantkit"
+Repository = "https://github.com/hannanhafeez/django-tenantkit"
+
+[tool.setuptools.packages.find]
+include = ["tenantkit*"]
+
+[tool.setuptools.package-data]
+tenantkit = ["py.typed"]
