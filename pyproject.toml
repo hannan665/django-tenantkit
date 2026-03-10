@@ -34,7 +34,7 @@ classifiers = [
 
 dependencies = [
     "Django>=4.2",
-    "django-tenants>=3.8.0",
+    "django-tenants>=3.9.0",
     "djangorestframework>=3.14.0",
     "PyJWT>=2.0.0",
 ]
@@ -43,7 +43,7 @@ dependencies = [
 test = [
     "pytest>=7.0",
     "pytest-django>=4.5",
-    "psycopg2-binary>=2.9",
+    "psycopg2-binary>=2.9.9",  # 2.9.9+ ships Python 3.13 wheels
 ]
 
 [project.urls]
