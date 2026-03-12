@@ -232,6 +232,56 @@ class TestValidateToken:
         assert result['id'] == '5'
 
 
+class TestTenantClaimCheck:
+
+    def setup_method(self):
+        self.auth = AuthUser()
+
+    def test_matching_tenant_claim_passes(self):
+        payload = {'tenant': 'acme', 'user_id': '1'}
+        self.auth._check_tenant_claim(payload, 'acme')  # should not raise
+
+    def test_mismatched_tenant_claim_raises(self):
+        payload = {'tenant': 'tenant_b', 'user_id': '1'}
+        with pytest.raises(AuthenticationError, match='Token does not belong to this tenant'):
+            self.auth._check_tenant_claim(payload, 'tenant_a')
+
+    def test_no_tenant_claim_passes(self):
+        """Tokens without a tenant claim are allowed (backward compatible)."""
+        payload = {'user_id': '1'}
+        self.auth._check_tenant_claim(payload, 'acme')  # should not raise
+
+    @patch('tenantkit.auth.jwt.apps')
+    @patch('tenantkit.auth.jwt.cache')
+    def test_cross_tenant_token_rejected(self, mock_cache, mock_apps):
+        """Token issued for tenant_b must be rejected when active tenant is tenant_a."""
+        mock_cache.get.return_value = None
+        set_current_tenant('tenant_a')
+
+        token = _make_token({'user_id': '1', 'tenant': 'tenant_b'})
+        with pytest.raises(AuthenticationError, match='Token does not belong to this tenant'):
+            self.auth.validate_token(token)
+
+        clear_context()
+
+    @patch('tenantkit.auth.jwt.apps')
+    @patch('tenantkit.auth.jwt.cache')
+    def test_correct_tenant_token_accepted(self, mock_cache, mock_apps):
+        """Token with matching tenant claim authenticates normally."""
+        mock_cache.get.return_value = None
+        user = _mock_user(user_id='1')
+        mock_model = MagicMock()
+        mock_model.objects.filter.return_value.first.return_value = user
+        mock_apps.get_model.return_value = mock_model
+
+        set_current_tenant('acme')
+        token = _make_token({'user_id': '1', 'tenant': 'acme'})
+        result = self.auth.validate_token(token)
+        assert result['tenant'] == 'acme'
+
+        clear_context()
+
+
 class TestGetUserInfo:
 
     def setup_method(self):

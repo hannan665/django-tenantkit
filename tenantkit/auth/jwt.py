@@ -115,6 +115,7 @@ class AuthUser:
         try:
             payload = self._decode(token)
             self._check_expiry(payload)
+            self._check_tenant_claim(payload, tenant_name)
             user_id = payload.get('user_id') or payload.get('sub')
             if not user_id:
                 raise AuthenticationError("No user_id found in token")
@@ -143,6 +144,12 @@ class AuthUser:
         exp = payload.get('exp')
         if exp and datetime.fromtimestamp(exp, tz=timezone.utc) < datetime.now(timezone.utc):
             raise AuthenticationError("Token has expired")
+
+    @staticmethod
+    def _check_tenant_claim(payload: Dict, tenant_name: str):
+        token_tenant = payload.get('tenant')
+        if token_tenant and token_tenant != tenant_name:
+            raise AuthenticationError("Token does not belong to this tenant")
 
     def _compute_cache_ttl(self, token: str) -> int:
         """Cap cache timeout to the token's remaining lifetime."""
