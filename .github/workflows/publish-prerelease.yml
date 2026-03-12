@@ -1,19 +1,18 @@
-name: Publish
+name: Publish Prerelease
 
 on:
   push:
     tags:
-      - "v*"
-      - "!v*a*"
-      - "!v*b*"
-      - "!v*rc*"
+      - "v*a*"   # e.g. v0.2.0a1
+      - "v*b*"   # e.g. v0.2.0b1
+      - "v*rc*"  # e.g. v0.2.0rc1
 
 jobs:
-  publish:
+  publish-testpypi:
     runs-on: ubuntu-latest
-    environment: pypi
+    environment: testpypi
     permissions:
-      id-token: write  # required for trusted publishing
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -28,5 +27,7 @@ jobs:
           pip install build
           python -m build
 
-      - name: Publish to PyPI
+      - name: Publish to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
